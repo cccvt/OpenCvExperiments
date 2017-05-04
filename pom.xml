@@ -26,11 +26,6 @@
             <artifactId>httpclient</artifactId>
             <version>4.5.2</version>
         </dependency>
-        <dependency>
-            <groupId>be.tomcools</groupId>
-            <artifactId>cd-test-web</artifactId>
-            <version>0.0.1-SNAPSHOT</version>
-        </dependency>
 
         <dependency>
             <groupId>org.mobicents.external.freetts</groupId>
@@ -66,6 +61,11 @@
             <groupId>org.mobicents.external.freetts</groupId>
             <artifactId>cmudict04</artifactId>
             <version>1.0</version>
+        </dependency>
+        <dependency>
+            <groupId>com.google.code.gson</groupId>
+            <artifactId>gson</artifactId>
+            <version>2.7</version>
         </dependency>
 
 

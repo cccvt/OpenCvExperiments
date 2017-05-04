@@ -10,6 +10,10 @@ import static org.opencv.core.Core.minMaxLoc;
  * Created by tomco on 20/01/2017.
  */
 public class TemplateMatchingDemo {
+
+    public static void main(String[] args) {
+        new TemplateMatchingDemo().run();
+    }
     public void run() {
         System.out.println("\nRunning TemplateMatching");
 

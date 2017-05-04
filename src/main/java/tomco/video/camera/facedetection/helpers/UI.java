@@ -14,7 +14,7 @@ public class UI {
     private JLabel videoPanel;
 
     public UI() {
-        jFrame = new JFrame("Regcognize Info Supporters");
+        jFrame = new JFrame("Do something");
         jFrame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         videoPanel = new JLabel();
 
