@@ -6,6 +6,7 @@ import org.opencv.imgproc.Imgproc;
 import org.opencv.objdetect.CascadeClassifier;
 
 public class DetectFaceDemo {
+
     public void run() {
         System.out.println("\nRunning DetectFaceDemo");
 

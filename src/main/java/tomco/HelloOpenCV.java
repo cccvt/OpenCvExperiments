@@ -1,7 +1,10 @@
 package tomco;
 
 import org.opencv.core.Core;
+import tomco.demos.TankDetection;
 import tomco.video.camera.facedetection.CameraAndFaceRecognition;
+
+import java.io.IOException;
 
 //
 // Detects faces in an image, draws boxes around them, and writes the results
@@ -14,15 +17,17 @@ public class HelloOpenCV {
         System.load("C:/Users/tomco/Downloads/opencv/build/bin/" + "opencv_ffmpeg320_64" + ".dll");
     }
 
-    public static void main(String[] args) throws InterruptedException {
+    public static void main(String[] args) throws InterruptedException, IOException {
         System.out.println("Hello, OpenCV");
 
 
         //new TemplateMatchingDemo().run();
         //new DetectFaceDemo().run();
         //new TelenetLogo().classify();
-        new CameraAndFaceRecognition().run();
+        //new CameraAndFaceRecognition().run();
         //new VideoToImages().run();
+
+        new TankDetection().run();
     }
 }
 

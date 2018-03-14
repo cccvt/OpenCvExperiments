@@ -1,4 +1,4 @@
-package tomco.video.camera.facedetection;
+package tomco.demos.mqtt;
 
 import org.opencv.core.*;
 import org.opencv.imgcodecs.Imgcodecs;
@@ -14,35 +14,59 @@ import tomco.video.camera.facedetection.helpers.cognitiveservices.CognitiveServi
 import tomco.video.camera.facedetection.helpers.cognitiveservices.responses.DetectFaces;
 import tomco.video.camera.facedetection.helpers.cognitiveservices.responses.IdentifyFaces;
 
+import javax.imageio.ImageIO;
 import java.awt.image.BufferedImage;
+import java.io.ByteArrayInputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.nio.charset.StandardCharsets;
+import java.util.Base64;
 import java.util.Timer;
 import java.util.TimerTask;
 import java.util.concurrent.Executors;
 
 import static tomco.video.camera.facedetection.helpers.MatHelpers.mat2BufferedImage;
 
-/**
- * Created by tomco on 20/01/2017.
- */
-public class CameraAndFaceRecognition extends HelloOpenCV {
+public class MQTTDemo extends HelloOpenCV {
+
     public static void main(String[] args) {
         try {
-            new CameraAndFaceRecognition().run();
+            new MQTTDemo().run();
         } catch (InterruptedException e) {
             e.printStackTrace();
         }
     }
 
     private CognitiveServicesFacesNew cs;
+    private final MQTTClient mqtt;
     private UI ui;
     private VoiceTts voice;
+    private Mat frame;
 
     private boolean busy = false;
 
-    public CameraAndFaceRecognition() {
-        this.cs = new CognitiveServicesFacesNew("6ff5ae598540491583a5ae9f11029697","ap-java-spring-boot-one");
+    public MQTTDemo() {
+        //this.cs = new CognitiveServicesFacesNew("6ff5ae598540491583a5ae9f11029697", "ap-java-spring-boot-one");
         this.ui = new UI();
-        this.voice = new VoiceTts();
+        //this.voice = new VoiceTts();
+        //this.mqtt = MQTTClient.connect("tcp://tomcools.cloudapp.net:1883", "demo");
+        this.mqtt = MQTTClient.connect("tcp://localhost:1883", "test");
+        mqtt.subscribe("camera1", (s, mqttMessage) -> {
+            System.out.println("Camera 1");
+            new Thread(() -> {
+                byte[] decode = Base64.getDecoder().decode(mqttMessage.getPayload());
+                InputStream in = new ByteArrayInputStream(decode);
+                BufferedImage bImageFromConvert = null;
+                try {
+                    bImageFromConvert = ImageIO.read(in);
+                } catch (IOException e) {
+                    System.out.println("Exception!");
+                }
+                render(bImageFromConvert);
+            }).start();
+
+        });
+        mqtt.subscribe("faceDetected", (s, mqttMessage) -> speak(new String(mqttMessage.getPayload()) + mqttMessage));
     }
 
     public void run() throws InterruptedException {
@@ -50,9 +74,10 @@ public class CameraAndFaceRecognition extends HelloOpenCV {
         CascadeClassifier faceDetector = new CascadeClassifier(getClass().getResource("/lbpcascade_frontalface.xml").getPath().substring(1));
         CascadeClassifier eyeDetector = new CascadeClassifier(getClass().getResource("/haarcascade_eye_tree_eyeglasses.xml").getPath().substring(1));
 
+        startWebsocketPolling();
 
-        Mat frame = new Mat();
-        
+        frame = new Mat();
+
         while (true) {
             if (camera.read(frame)) {
                 MatOfRect faceDetections = new MatOfRect();
@@ -73,7 +98,7 @@ public class CameraAndFaceRecognition extends HelloOpenCV {
                         detectedFace(frame);
                     }
                 }
-                render(frame);
+                //render(frame);
             }
 
         }
@@ -83,9 +108,13 @@ public class CameraAndFaceRecognition extends HelloOpenCV {
         Imgproc.rectangle(frame, new Point(rect.x, rect.y), new Point(rect.x + rect.width, rect.y + rect.height), color);
     }
 
-    private void render(Mat frame) {
+    private void render(final Mat frame) {
         BufferedImage bufferedImage = mat2BufferedImage(frame);
-        ui.render(bufferedImage);
+        render(bufferedImage);
+    }
+
+    private void render(final BufferedImage frame) {
+        ui.render(frame);
     }
 
     public void detectedFace(Mat frame) {
@@ -94,8 +123,7 @@ public class CameraAndFaceRecognition extends HelloOpenCV {
             setTimer();
             Executors.newSingleThreadExecutor().execute(() -> {
                 MatOfByte matOfByte = new MatOfByte();
-                Imgcodecs.imencode(".jpg", frame, matOfByte);
-
+                Imgcodecs.imencode(".png", frame, matOfByte);
                 byte[] bytes = matOfByte.toArray().clone();
 
                 DetectFaces detectedFaces = cs.detectFaces(bytes);
@@ -119,12 +147,31 @@ public class CameraAndFaceRecognition extends HelloOpenCV {
         }, Config.BACKEND_TIMEOUT);
     }
 
+    private void startWebsocketPolling() {
+        new Timer().scheduleAtFixedRate(new TimerTask() {
+            @Override
+            public void run() {
+                new Thread(() -> {
+                    Mat small = new Mat();
+                    Imgproc.resize(frame, small, new Size(640, 480));
+                    MatOfByte matOfByte = new MatOfByte();
+                    Imgcodecs.imencode(".png", small, matOfByte);
+                    byte[] bytes = matOfByte.toArray().clone();
+                    //String encoded = new String(Base64.getEncoder().encode(bytes), StandardCharsets.UTF_8);
+                    String encoded = Base64.getEncoder().encodeToString(bytes);
+                    mqtt.sendMessage("camera1", encoded);
+                }).start();
+
+            }
+        }, 3000, 100);
+    }
+
     private void identify(DetectFaces detectedFaces) {
         IdentifyFaces identify = cs.identify(detectedFaces);
         if (identify.size() > 0) {
             String personName = cs.getPersonName(identify.getPersonId().get(0));
             System.out.println("Faces Identified: " + personName);
-            speak("Welcome " + personName);
+            //mqtt.sendMessage("faceDetected", "Welcome " + personName);
         } else {
             System.out.println("Microsoft could not identify the found faces");
         }

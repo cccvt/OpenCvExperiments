@@ -53,6 +53,13 @@ public class CognitiveServicesFacesNew {
         executeRequest(post);
     }
 
+    public void clearAll() {
+        HttpGet get = new HttpGet("https://westus.api.cognitive.microsoft.com/face/v1.0/persongroups/" + persongroup + "/persons/");
+        appendKeyHeader(get);
+        String response = executeRequest(get);
+
+    }
+
     public void createGroup() {
         //https://westus.api.cognitive.microsoft.com/face/v1.0/persongroups/{personGroupId}
         HttpPut put = new HttpPut("https://westus.api.cognitive.microsoft.com/face/v1.0/persongroups/" + persongroup);

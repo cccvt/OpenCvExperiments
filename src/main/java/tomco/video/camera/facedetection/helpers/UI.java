@@ -2,7 +2,7 @@ package tomco.video.camera.facedetection.helpers;
 
 import javax.swing.*;
 import java.awt.*;
-import java.awt.event.ItemEvent;
+import java.awt.event.ActionListener;
 import java.awt.image.BufferedImage;
 
 /**
@@ -11,26 +11,23 @@ import java.awt.image.BufferedImage;
 public class UI {
 
     private JFrame jFrame;
+    private JTextField jTextField;
     private JLabel videoPanel;
+    private JButton jButton;
 
     public UI() {
-        jFrame = new JFrame("Do something");
+        jFrame = new JFrame("Face Adder");
         jFrame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         videoPanel = new JLabel();
+        jButton = new JButton("SNAP PICTURE");
 
-        JCheckBox checkBox = new JCheckBox("Backend calls?");
-        checkBox.setSelected(Config.BACKEND_ENABLED);
-        checkBox.addItemListener(e -> {
-            if (e.getStateChange() == ItemEvent.DESELECTED) {
-                Config.BACKEND_ENABLED = false;
-            } else {
-                Config.BACKEND_ENABLED = true;
-            }
-        });
+        jTextField = new JTextField();
+
         Container container = jFrame.getContentPane();
 
         container.add(videoPanel, BorderLayout.CENTER);
-        container.add(checkBox, BorderLayout.EAST);
+        container.add(jTextField, BorderLayout.NORTH);
+        container.add(jButton, BorderLayout.SOUTH);
 
         jFrame.setVisible(true);
         jFrame.setSize(800, 500);
@@ -40,5 +37,13 @@ public class UI {
         ImageIcon image = new ImageIcon(bufferedImage);
         videoPanel.setIcon(image);
         videoPanel.repaint();
+    }
+
+    public void setButtonListener(ActionListener actionListener) {
+        this.jButton.addActionListener(actionListener);
+    }
+
+    public String getNameValue() {
+        return jTextField.getText();
     }
 }
