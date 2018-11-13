@@ -54,7 +54,9 @@ public class CameraAndFaceRecognition extends HelloOpenCV {
         Mat frame = new Mat();
         
         while (true) {
-            if (camera.read(frame)) {
+            frame = Imgcodecs.imread("/people-08.jpg");
+            if(true) {
+            //if (camera.read(frame)) {
                 MatOfRect faceDetections = new MatOfRect();
                 MatOfRect eyeDetections = new MatOfRect();
                 faceDetector.detectMultiScale(frame, faceDetections);

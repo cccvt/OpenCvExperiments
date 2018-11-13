@@ -24,7 +24,7 @@ public class DetectFaceDemo {
 
         // Draw a bounding box around each face.
         for (Rect rect : faceDetections.toArray()) {
-            Imgproc.rectangle(image, new Point(rect.x, rect.y), new Point(rect.x + rect.width, rect.y + rect.height), new Scalar(0, 255, 0));
+            Imgproc.rectangle(image, new Point(rect.x, rect.y), new Point(rect.x + rect.width, rect.y + rect.height), new Scalar(0, 255, 0),10);
         }
 
         // Save the visualized detection.

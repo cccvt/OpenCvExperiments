@@ -7,6 +7,7 @@ import org.apache.http.entity.ByteArrayEntity;
 import org.apache.http.entity.StringEntity;
 import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.HttpClientBuilder;
+import org.opencv.core.Mat;
 import tomco.video.camera.facedetection.helpers.cognitiveservices.responses.*;
 
 import java.io.IOException;
@@ -128,5 +129,9 @@ public class CognitiveServicesFacesNew {
         } catch (IOException e) {
             throw new RuntimeException("Error while executing request;");
         }
+    }
+
+    public void detectFaces(Mat frame) {
+
     }
 }

@@ -1,6 +1,7 @@
 package tomco;
 
 import org.opencv.core.Core;
+import tomco.demos.DetectFaceDemo;
 import tomco.demos.TankDetection;
 import tomco.video.camera.facedetection.CameraAndFaceRecognition;
 
@@ -22,12 +23,12 @@ public class HelloOpenCV {
 
 
         //new TemplateMatchingDemo().run();
-        //new DetectFaceDemo().run();
+        new DetectFaceDemo().run();
         //new TelenetLogo().classify();
         //new CameraAndFaceRecognition().run();
         //new VideoToImages().run();
 
-        new TankDetection().run();
+        //new TankDetection().run();
     }
 }
 
