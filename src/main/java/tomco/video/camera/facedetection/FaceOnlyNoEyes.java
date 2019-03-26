@@ -35,21 +35,40 @@ public class FaceOnlyNoEyes extends HelloOpenCV {
     }
 
     public void run() {
+        // Select a Camera
         VideoCapture camera = new VideoCapture(0);
+
+        // Load a Classifier (pre-trained model packaged with OpenCV)
         CascadeClassifier faceDetector =
                 ClassifierLoader.load("/lbpcascade_frontalface.xml");
 
         Mat frame = new Mat();
+        // LOOP FOREVER!!!
         while (true) {
             if (camera.read(frame)) {
+
+                // Run a detection on the frame
                 MatOfRect faceDetections = new MatOfRect();
                 faceDetector.detectMultiScale(frame, faceDetections);
-                for (Rect face : faceDetections.toArray()) {
-                    drawRectangle(frame, face, Colors.GREEN);
+                Rect[] detectedFaces = faceDetections.toArray();
+
+                // Draw rectangles on the original frame
+                drawRectangles(detectedFaces, frame);
+
+                // only send the frame to Cognitive Services if you actually detected a face
+                if(detectedFaces.length > 0) {
                     cognitiveServices.detectFaces(frame);
                 }
+
+                // Render the edited frame in a simple application
                 render(frame);
             }
+        }
+    }
+
+    private void drawRectangles(Rect[] detectedFaces, Mat frame) {
+        for (Rect face : detectedFaces) {
+            drawRectangle(frame, face, Colors.GREEN);
         }
     }
 
